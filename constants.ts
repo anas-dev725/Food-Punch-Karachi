@@ -3,7 +3,9 @@ import { MenuItem, Review } from './types';
 
 export const BUSINESS_INFO = {
   name: 'Food Punch Karachi',
-  whatsapp: '+923312721804',
+  whatsapp: '+92 331 2721804',
+  instagram: 'https://www.instagram.com/foodpunchkhi/?hl=en',
+  facebook: 'https://www.facebook.com/foodpunchkhi/',
   foodpanda: 'https://www.foodpanda.pk/restaurant/fpk/food-punch-karachi',
   tagline: 'Authenticity in Every Punch!',
   description: 'Karachi\'s premier home-based food delivery, specializing in traditional Memoni Khawsa and Singaporean Rice.',
@@ -29,8 +31,8 @@ export const MENU_ITEMS: MenuItem[] = [
     description: 'Layers of premium rice, noodles, spicy chicken, and our signature mayo-garlic sauce topping. A crowd favorite.',
     price: 750,
     category: 'Signature',
-    // Rice bowl with toppings style image
-    image: 'https://images.unsplash.com/photo-1603133872878-684f1084263d?auto=format&fit=crop&q=80&w=800',
+    // High quality rice bowl image
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
     tag: 'Signature'
   },
   {

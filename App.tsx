@@ -25,7 +25,8 @@ import {
   Clock,
   HelpCircle,
   MapPin,
-  ShieldCheck
+  ShieldCheck,
+  MessageCircle
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -393,8 +394,30 @@ const App: React.FC = () => {
               <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-6">Food Punch Karachi</h2>
               <p className="text-gray-500 dark:text-slate-400 max-w-sm mb-8 font-medium mx-auto md:mx-0">Authentic Karachi taste delivered to your home. Pure hygiene, zero compromises.</p>
               <div className="flex justify-center md:justify-start space-x-4">
-                <a href="#" className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-gray-400 hover:text-primary transition-all border border-gray-100 dark:border-slate-800"><Instagram className="w-5 h-5" /></a>
-                <a href="#" className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-gray-400 hover:text-primary transition-all border border-gray-100 dark:border-slate-800"><Facebook className="w-5 h-5" /></a>
+                <a 
+                  href={BUSINESS_INFO.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-gray-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-slate-800 transition-all border border-gray-100 dark:border-slate-800 group"
+                >
+                  <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </a>
+                <a 
+                  href={BUSINESS_INFO.facebook} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all border border-gray-100 dark:border-slate-800 group"
+                >
+                  <Facebook className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </a>
+                <a 
+                  href={`https://wa.me/${BUSINESS_INFO.whatsapp.replace(/\s+/g, '')}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-slate-800 transition-all border border-gray-100 dark:border-slate-800 group"
+                >
+                  <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </a>
               </div>
             </div>
             <div>
