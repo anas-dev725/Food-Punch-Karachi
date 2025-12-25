@@ -390,7 +390,15 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 text-center md:text-left">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
             <div className="lg:col-span-2">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white font-black text-2xl mb-8 mx-auto md:mx-0">FP</div>
+              {BUSINESS_INFO.logoUrl ? (
+                <img 
+                  src={BUSINESS_INFO.logoUrl} 
+                  alt="Food Punch Logo" 
+                  className="w-14 h-14 rounded-2xl object-cover mb-8 mx-auto md:mx-0 shadow-lg shadow-primary/20" 
+                />
+              ) : (
+                <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white font-black text-2xl mb-8 mx-auto md:mx-0">FP</div>
+              )}
               <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-6">Food Punch Karachi</h2>
               <p className="text-gray-500 dark:text-slate-400 max-w-sm mb-8 font-medium mx-auto md:mx-0">Authentic Karachi taste delivered to your home. Pure hygiene, zero compromises.</p>
               <div className="flex justify-center md:justify-start space-x-4">

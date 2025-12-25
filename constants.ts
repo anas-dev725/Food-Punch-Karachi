@@ -6,7 +6,7 @@ export const BUSINESS_INFO = {
   whatsapp: '+92 331 2721804',
   instagram: 'https://www.instagram.com/foodpunchkhi/?hl=en',
   facebook: 'https://www.facebook.com/foodpunchkhi/',
-  foodpanda: 'https://www.foodpanda.pk/restaurant/fpk/food-punch-karachi',
+  foodpanda: 'https://www.foodpanda.pk/restaurant/eih3/food-punch-karachi-eih3',
   tagline: 'Authenticity in Every Punch!',
   description: 'Karachi\'s premier home-based food delivery, specializing in traditional Memoni Khawsa and Singaporean Rice.',
   // Use a food-related vector or your actual logo URL here. 
