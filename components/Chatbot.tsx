@@ -1,16 +1,28 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, MessageSquare } from 'lucide-react';
+import { MessageCircle, Send, X, MessageSquare, ShoppingCart } from 'lucide-react';
+import { Content } from '@google/genai';
 import { getChatbotResponse } from '../services/geminiService';
-import { ChatMessage } from '../types';
-import { BUSINESS_INFO } from '../constants';
+import { ChatMessage, MenuItem } from '../types';
+import { MENU_ITEMS } from '../constants';
 
-const Chatbot: React.FC = () => {
+interface ChatbotProps {
+  onAddToCart?: (item: MenuItem, openCart?: boolean) => void;
+}
+
+const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
+  
+  // UI Messages (simple text for display)
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'model', text: 'Hi! I\'m your Food Punch assistant. How can I help you with your order today?' }
   ]);
+  
+  // API History (Full structured content for Gemini)
+  // We initialize it empty; the system instruction is handled in the service.
+  const [apiHistory, setApiHistory] = useState<Content[]>([]);
+  
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -18,19 +30,116 @@ const Chatbot: React.FC = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMsg = input.trim();
+    const userMsgText = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    
+    // 1. Update UI immediately
+    setMessages(prev => [...prev, { role: 'user', text: userMsgText }]);
     setIsLoading(true);
 
-    const response = await getChatbotResponse(userMsg, messages);
-    setMessages(prev => [...prev, { role: 'model', text: response }]);
-    setIsLoading(false);
+    // 2. Prepare History for API
+    // We append the new user message to the existing API history
+    const userContent: Content = { role: 'user', parts: [{ text: userMsgText }] };
+    let currentHistory = [...apiHistory, userContent];
+
+    try {
+      // 3. First API Call
+      const result1 = await getChatbotResponse(currentHistory);
+
+      if (result1.toolCalls && result1.toolCalls.length > 0 && onAddToCart) {
+        // --- HANDLE TOOL CALL ---
+
+        // A. Add the Model's Tool Call message to history so the model knows it asked for this
+        if (result1.modelContent) {
+           currentHistory = [...currentHistory, result1.modelContent];
+        }
+
+        let addedItemsCount = 0;
+        const functionResponses = [];
+
+        // B. Execute Tools
+        for (const call of result1.toolCalls) {
+          if (call.name === 'addToCart') {
+            const itemsToAdd = (call.args as any).items || [];
+            for (const itemRequest of itemsToAdd) {
+              const matchedItem = MENU_ITEMS.find(m => 
+                m.name.toLowerCase().includes(itemRequest.itemName.toLowerCase()) || 
+                itemRequest.itemName.toLowerCase().includes(m.name.toLowerCase())
+              );
+
+              if (matchedItem) {
+                const qty = itemRequest.quantity || 1;
+                for(let i=0; i<qty; i++) {
+                  onAddToCart(matchedItem, false); // Silent add
+                }
+                addedItemsCount += qty;
+              }
+            }
+            
+            // Prepare response for this specific function call
+            functionResponses.push({
+              id: call.id, // Important to map back to the call ID
+              name: call.name,
+              response: { result: { success: true, message: `Added ${itemsToAdd.length} items to cart.` } }
+            });
+          }
+        }
+
+        // C. Send Tool Response back to Model
+        const toolResponseContent: Content = {
+          role: 'function', 
+          parts: functionResponses.map(fr => ({
+            functionResponse: fr
+          }))
+        };
+        
+        currentHistory = [...currentHistory, toolResponseContent];
+
+        // D. Second API Call (Follow-up)
+        // Now the model sees: User -> Model(ToolCall) -> User/Function(ToolResult) -> ?
+        // It should generate the confirmation text now.
+        const result2 = await getChatbotResponse(currentHistory);
+        
+        // Update UI with the final text
+        if (result2.text) {
+          setMessages(prev => [...prev, { role: 'model', text: result2.text }]);
+          // Update API history with the final text model response
+          if (result2.modelContent) {
+             setApiHistory([...currentHistory, result2.modelContent]);
+          } else {
+             setApiHistory(currentHistory);
+          }
+        } else {
+          // Fallback if model stays silent (unlikely with revised prompt)
+           setMessages(prev => [...prev, { role: 'model', text: "I've added those items to your cart!" }]);
+           setApiHistory(currentHistory);
+        }
+
+      } else {
+        // --- NORMAL TEXT RESPONSE ---
+        if (result1.text) {
+          setMessages(prev => [...prev, { role: 'model', text: result1.text }]);
+        }
+        
+        // Update API history
+        if (result1.modelContent) {
+          setApiHistory([...currentHistory, result1.modelContent]);
+        } else {
+          // If for some reason content is missing but text exists (legacy), construct it
+          setApiHistory([...currentHistory, { role: 'model', parts: [{ text: result1.text }] }]);
+        }
+      }
+    } catch (error) {
+      console.error("Error in chat loop", error);
+      setMessages(prev => [...prev, { role: 'model', text: "Sorry, I'm having trouble connecting right now." }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -8,7 +8,7 @@ interface NavbarProps {
   onCartClick: () => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
-  onNavigate: (page: 'home' | 'menu') => void;
+  onNavigate: (page: 'home' | 'menu' | 'catering') => void;
   currentPage: string;
 }
 
@@ -40,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick, theme, toggleTh
           </div>
 
           <div className="hidden md:flex items-center space-x-10">
-            {['home', 'menu'].map((page) => (
+            {['home', 'menu', 'catering'].map((page) => (
               <button 
                 key={page}
                 onClick={() => onNavigate(page as any)}
@@ -49,7 +49,6 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick, theme, toggleTh
                 {page}
               </button>
             ))}
-            <button className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-primary">Catering</button>
           </div>
 
           <div className="flex items-center space-x-6">

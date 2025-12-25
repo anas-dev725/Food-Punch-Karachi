@@ -9,7 +9,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onExplore }) => {
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-48 pb-20 overflow-hidden dot-grid">
+    <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden dot-grid">
       {/* Food-themed Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] hero-gradient rounded-full blur-[100px]"></div>
@@ -18,7 +18,7 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Badge - Now clearly visible due to increased padding */}
-        <div className="inline-flex items-center space-x-3 bg-white dark:bg-slate-800 px-8 py-4 rounded-full border-2 border-primary/20 shadow-[0_0_40px_rgba(239,68,68,0.25)] mb-12 animate-in fade-in slide-in-from-top-4 duration-700 hover:scale-105 transition-transform cursor-default">
+        <div className="inline-flex items-center space-x-3 bg-white dark:bg-slate-800 px-8 py-4 rounded-full border-2 border-primary/20 shadow-[0_0_40px_rgba(239,68,68,0.25)] mb-8 animate-in fade-in slide-in-from-top-4 duration-700 hover:scale-105 transition-transform cursor-default">
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
@@ -29,7 +29,7 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
         {/* 3-Line Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-[76px] font-extrabold text-gray-900 dark:text-white leading-[1.05] mb-8 tracking-tighter animate-in fade-in slide-in-from-bottom-4 duration-1000">
           Hi, We're <span className="text-primary">Food Punch</span><br />
-          Specializing in <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Authentic Memoni</span><br />
+          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Authentic Memoni</span> Taste<br />
           <span className="text-gray-400 dark:text-slate-400">Karachi-Style Flavors</span>
         </h1>
 
@@ -56,19 +56,19 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
           </a>
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto animate-in fade-in duration-1000 delay-500">
+        {/* Feature Cards - Redesigned to match image */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-in fade-in duration-1000 delay-500">
           {[
-            { icon: <Utensils className="w-5 h-5" />, title: 'Pure Taste', sub: 'Traditional recipes' },
-            { icon: <ShieldCheck className="w-5 h-5" />, title: 'Top Hygiene', sub: 'Home-prep safety' },
-            { icon: <Truck className="w-5 h-5" />, title: 'Fast Delivery', sub: 'Karachi wide' }
+            { icon: <Utensils className="w-6 h-6" />, title: 'Pure Taste', sub: 'Traditional recipes' },
+            { icon: <ShieldCheck className="w-6 h-6" />, title: 'Top Hygiene', sub: 'Home-prep safety' },
+            { icon: <Truck className="w-6 h-6" />, title: 'Fast Delivery', sub: 'Karachi wide' }
           ].map((item, idx) => (
-            <div key={idx} className="flex flex-col items-center p-4 bg-white/50 dark:bg-slate-900/30 rounded-2xl backdrop-blur-sm border border-gray-100/50 dark:border-slate-800/50">
-              <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center text-primary mb-3">
+            <div key={idx} className="group flex flex-col items-center p-8 bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 w-full md:w-64 mx-auto">
+              <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-[1.5rem] flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform duration-300">
                 {item.icon}
               </div>
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">{item.title}</h3>
-              <p className="text-[9px] text-gray-500 dark:text-slate-500 font-bold uppercase tracking-[0.2em]">{item.sub}</p>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">{item.sub}</p>
             </div>
           ))}
         </div>

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Menu from './components/Menu';
+import Catering from './components/Catering';
 import Cart from './components/Cart';
 import Chatbot from './components/Chatbot';
 import { CartItem, MenuItem } from './types';
@@ -28,7 +29,7 @@ import {
 } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'home' | 'menu'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'menu' | 'catering'>('home');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -42,9 +43,14 @@ const App: React.FC = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Scroll to top whenever currentPage changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [currentPage]);
+
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (item: MenuItem, openCart = true) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === item.id);
       if (existing) {
@@ -52,7 +58,9 @@ const App: React.FC = () => {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
-    setIsCartOpen(true);
+    if (openCart) {
+      setIsCartOpen(true);
+    }
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -92,8 +100,8 @@ const App: React.FC = () => {
           <>
             <Hero onExplore={() => setCurrentPage('menu')} />
 
-            {/* Our Story Section */}
-            <section className="py-24 bg-white dark:bg-slate-950 overflow-hidden">
+            {/* Our Story Section - ALTERNATING BG (Gray) */}
+            <section className="py-24 bg-gray-50 dark:bg-slate-900 overflow-hidden border-t border-gray-100 dark:border-slate-800">
               <div className="max-w-6xl mx-auto px-6">
                 <div className="flex flex-col lg:flex-row items-center gap-16">
                   {/* Image Side */}
@@ -140,7 +148,7 @@ const App: React.FC = () => {
               </div>
             </section>
             
-            {/* Signatures Section */}
+            {/* Signatures Section - ALTERNATING BG (White) */}
             <section className="py-24 bg-white dark:bg-slate-950 border-t border-gray-100 dark:border-slate-900 dot-grid">
               <div className="max-w-6xl mx-auto px-6">
                 <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
@@ -198,8 +206,8 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {/* How It Works Section */}
-            <section className="py-24 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-800">
+            {/* How It Works Section - ALTERNATING BG (Gray) */}
+            <section className="py-24 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
               <div className="max-w-6xl mx-auto px-6">
                 <div className="text-center mb-20">
                     <span className="text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-4 block">The Process</span>
@@ -265,7 +273,7 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* FAQ Section */}
+            {/* FAQ Section - ALTERNATING BG (White) */}
             <section className="py-24 bg-white dark:bg-slate-950 border-t border-gray-100 dark:border-slate-900">
                 <div className="max-w-4xl mx-auto px-6">
                     <div className="text-center mb-16">
@@ -305,8 +313,8 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* Reviews */}
-            <section className="py-24 bg-gray-50 dark:bg-slate-900/30">
+            {/* Reviews - ALTERNATING BG (Gray) */}
+            <section className="py-24 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
               <div className="max-w-6xl mx-auto px-6">
                 <div className="flex items-center space-x-4 mb-16 justify-center">
                   <Heart className="text-primary fill-primary" />
@@ -314,7 +322,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {REVIEWS.map((review) => (
-                    <div key={review.id} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col hover:translate-y-[-5px] transition-transform duration-300">
+                    <div key={review.id} className="bg-white dark:bg-slate-950 p-8 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col hover:translate-y-[-5px] transition-transform duration-300">
                       <div className="flex space-x-1 mb-6">
                         {[...Array(review.rating)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 text-secondary fill-secondary" />
@@ -333,8 +341,8 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-12 bg-white dark:bg-slate-950 mb-12">
+            {/* CTA Section - ALTERNATING BG (White) */}
+            <section className="py-12 bg-white dark:bg-slate-950 mb-12 border-t border-gray-100 dark:border-slate-900">
               <div className="max-w-5xl mx-auto px-6">
                 <div className="bg-gray-900 dark:bg-slate-900 rounded-[3rem] p-12 md:p-24 relative overflow-hidden shadow-2xl text-center border border-gray-800">
                     <div className="absolute top-0 left-0 w-96 h-96 bg-primary/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
@@ -364,9 +372,15 @@ const App: React.FC = () => {
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 <span>Return to Home</span>
               </button>
-              <h2 className="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white tracking-tighter leading-tight">Full Menu</h2>
+              <h2 className="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white tracking-tighter leading-tight">
+                {currentPage === 'menu' ? 'Pick Your Punch' : 'Catering'}
+              </h2>
             </div>
-            <Menu onAddToCart={addToCart} />
+            {currentPage === 'menu' ? (
+              <Menu onAddToCart={addToCart} />
+            ) : (
+              <Catering />
+            )}
           </div>
         )}
       </main>
@@ -407,7 +421,7 @@ const App: React.FC = () => {
       </footer>
 
       {/* Chatbot and Cart */}
-      <Chatbot />
+      <Chatbot onAddToCart={addToCart} />
 
       <Cart 
         isOpen={isCartOpen} 

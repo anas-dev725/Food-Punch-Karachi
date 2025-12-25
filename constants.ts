@@ -120,3 +120,30 @@ export const REVIEWS: Review[] = [
   { id: 'r3', name: 'Sara Khan', text: 'Hygiene is clearly a priority. Everything was packaged so well.', rating: 5 },
   { id: 'r4', name: 'Mustafa Jalal', text: 'Ordered the Monday Special. The Makhni was incredibly creamy and fresh.', rating: 5 }
 ];
+
+export const CATERING_SERVICES = [
+  {
+    id: 'bulk',
+    title: 'Bulk Orders',
+    description: 'Family gatherings or religious events? Order our famous Khawsa or Biryani by the Daig.',
+    icon: 'Package'
+  },
+  {
+    id: 'corporate',
+    title: 'Corporate Events',
+    description: 'Premium lunch boxes and executive catering for office meetings and seminars.',
+    icon: 'Briefcase'
+  },
+  {
+    id: 'live-station',
+    title: 'Live Stations',
+    description: 'Add charm to your parties with our live Kachri Qeema or Fry Kebab stations.',
+    icon: 'Flame'
+  },
+  {
+    id: 'hi-tea',
+    title: 'Hi-Tea Platters',
+    description: 'Assorted finger foods including Shami Kebabs, Spring Rolls, and Sandwiches.',
+    icon: 'Coffee'
+  }
+];
