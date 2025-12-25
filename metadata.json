@@ -1,0 +1,7 @@
+{
+  "name": "Food Punch Karachi",
+  "description": "Authentic home-made Memoni Khawsa and Singaporean Rice from the heart of Karachi. Quality and hygiene guaranteed.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
