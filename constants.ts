@@ -30,7 +30,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 750,
     category: 'Signature',
     // Rice bowl with toppings style image
-    image: 'https://images.unsplash.com/photo-1603133872878-684f1084261d?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1603133872878-684f1084263d?auto=format&fit=crop&q=80&w=800',
     tag: 'Signature'
   },
   {

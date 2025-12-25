@@ -108,9 +108,9 @@ const App: React.FC = () => {
                   <div className="w-full lg:w-1/2 relative">
                     <div className="absolute top-0 left-0 w-full h-full bg-primary/10 rounded-[3rem] -rotate-3 transform scale-105 -z-10"></div>
                     <img
-                      src="https://images.unsplash.com/photo-1606914501449-119131edd4c0?q=80&w=1000"
+                      src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?auto=format&fit=crop&q=80&w=1000"
                       alt="Preparing food with love"
-                      className="w-full rounded-[3rem] shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700"
+                      className="w-full h-auto block rounded-[3rem] shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700 object-cover"
                     />
                     <div className="absolute -bottom-10 -right-10 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-slate-800 max-w-xs hidden md:block">
                        <p className="text-sm font-bold text-gray-900 dark:text-white italic">"The secret ingredient is always love."</p>
