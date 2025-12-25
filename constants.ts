@@ -9,7 +9,7 @@ export const BUSINESS_INFO = {
   description: 'Karachi\'s premier home-based food delivery, specializing in traditional Memoni Khawsa and Singaporean Rice.',
   // Use a food-related vector or your actual logo URL here. 
   // If this string is empty, it defaults to the "FP" text icon.
-  logoUrl: 'https://img.icons8.com/fluency/96/chef-hat.png' 
+  logoUrl: 'https://raw.githubusercontent.com/anas-dev725/Food-Punch-Karachi/7f6f6282c38aae6d9ca3a1d19446175e53f91610/food%20punch.jpg'
 };
 
 export const MENU_ITEMS: MenuItem[] = [

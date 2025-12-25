@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, MessageSquare, Phone } from 'lucide-react';
+import { MessageCircle, Send, X, MessageSquare } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService';
 import { ChatMessage } from '../types';
 import { BUSINESS_INFO } from '../constants';
@@ -112,17 +112,6 @@ const Chatbot: React.FC = () => {
         >
           {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
         </button>
-        
-        {/* Direct WhatsApp Button */}
-        <a 
-          href={`https://wa.me/${BUSINESS_INFO.whatsapp}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:shadow-green-200 hover:scale-110 transition-all flex items-center justify-center"
-          title="Direct WhatsApp Message"
-        >
-          <Phone className="w-7 h-7" />
-        </a>
       </div>
     </div>
   );
