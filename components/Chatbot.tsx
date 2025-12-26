@@ -1,9 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, MessageSquare, ShoppingCart } from 'lucide-react';
-import { Content } from '@google/genai';
+import { MessageCircle, Send, X, MessageSquare } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService';
-import { ChatMessage, MenuItem } from '../types';
+import { ChatMessage, MenuItem, Content, Part } from '../types';
 import { MENU_ITEMS } from '../constants';
 
 interface ChatbotProps {
@@ -13,16 +12,10 @@ interface ChatbotProps {
 const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  
-  // UI Messages (simple text for display)
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'model', text: 'Hi! I\'m your Food Punch assistant. How can I help you with your order today?' }
   ]);
-  
-  // API History (Full structured content for Gemini)
-  // We initialize it empty; the system instruction is handled in the service.
   const [apiHistory, setApiHistory] = useState<Content[]>([]);
-  
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -37,35 +30,27 @@ const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
 
     const userMsgText = input.trim();
     setInput('');
-    
-    // 1. Update UI immediately
     setMessages(prev => [...prev, { role: 'user', text: userMsgText }]);
     setIsLoading(true);
 
-    // 2. Prepare History for API
-    // We append the new user message to the existing API history
     const userContent: Content = { role: 'user', parts: [{ text: userMsgText }] };
     let currentHistory = [...apiHistory, userContent];
 
     try {
-      // 3. First API Call
       const result1 = await getChatbotResponse(currentHistory);
 
       if (result1.toolCalls && result1.toolCalls.length > 0 && onAddToCart) {
-        // --- HANDLE TOOL CALL ---
-
-        // A. Add the Model's Tool Call message to history so the model knows it asked for this
+        // Tool was called
         if (result1.modelContent) {
            currentHistory = [...currentHistory, result1.modelContent];
         }
 
-        let addedItemsCount = 0;
-        const functionResponses = [];
+        const functionResponses: Part[] = [];
 
-        // B. Execute Tools
         for (const call of result1.toolCalls) {
           if (call.name === 'addToCart') {
             const itemsToAdd = (call.args as any).items || [];
+            let addedDescription = "";
             for (const itemRequest of itemsToAdd) {
               const matchedItem = MENU_ITEMS.find(m => 
                 m.name.toLowerCase().includes(itemRequest.itemName.toLowerCase()) || 
@@ -75,68 +60,58 @@ const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
               if (matchedItem) {
                 const qty = itemRequest.quantity || 1;
                 for(let i=0; i<qty; i++) {
-                  onAddToCart(matchedItem, false); // Silent add
+                  onAddToCart(matchedItem, false);
                 }
-                addedItemsCount += qty;
+                addedDescription += `${qty}x ${matchedItem.name}, `;
               }
             }
             
-            // Prepare response for this specific function call
             functionResponses.push({
-              id: call.id, // Important to map back to the call ID
-              name: call.name,
-              response: { result: { success: true, message: `Added ${itemsToAdd.length} items to cart.` } }
+              functionResponse: {
+                id: call.id,
+                name: call.name,
+                response: { result: { success: true, message: `Successfully added: ${addedDescription}` } }
+              }
             });
           }
         }
 
-        // C. Send Tool Response back to Model
-        const toolResponseContent: Content = {
-          role: 'function', 
-          parts: functionResponses.map(fr => ({
-            functionResponse: fr
-          }))
-        };
-        
+        const toolResponseContent: Content = { role: 'function', parts: functionResponses };
         currentHistory = [...currentHistory, toolResponseContent];
 
-        // D. Second API Call (Follow-up)
-        // Now the model sees: User -> Model(ToolCall) -> User/Function(ToolResult) -> ?
-        // It should generate the confirmation text now.
+        // Get final response after tool execution
         const result2 = await getChatbotResponse(currentHistory);
         
-        // Update UI with the final text
         if (result2.text) {
           setMessages(prev => [...prev, { role: 'model', text: result2.text }]);
-          // Update API history with the final text model response
           if (result2.modelContent) {
              setApiHistory([...currentHistory, result2.modelContent]);
           } else {
              setApiHistory(currentHistory);
           }
         } else {
-          // Fallback if model stays silent (unlikely with revised prompt)
-           setMessages(prev => [...prev, { role: 'model', text: "I've added those items to your cart!" }]);
+           setMessages(prev => [...prev, { role: 'model', text: "I've added those items for you!" }]);
            setApiHistory(currentHistory);
         }
 
       } else {
-        // --- NORMAL TEXT RESPONSE ---
+        // Normal text response
         if (result1.text) {
           setMessages(prev => [...prev, { role: 'model', text: result1.text }]);
+        } else {
+           // If somehow text is empty and no tools
+           setMessages(prev => [...prev, { role: 'model', text: "I'm listening, but I didn't quite catch that." }]);
         }
-        
-        // Update API history
+
         if (result1.modelContent) {
           setApiHistory([...currentHistory, result1.modelContent]);
-        } else {
-          // If for some reason content is missing but text exists (legacy), construct it
+        } else if (result1.text) {
           setApiHistory([...currentHistory, { role: 'model', parts: [{ text: result1.text }] }]);
         }
       }
     } catch (error) {
-      console.error("Error in chat loop", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Sorry, I'm having trouble connecting right now." }]);
+      console.error("Chat error:", error);
+      setMessages(prev => [...prev, { role: 'model', text: "I'm having a bit of trouble connecting. Please try again!" }]);
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +128,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
               </div>
               <div>
                 <h3 className="font-bold text-sm">Food Punch AI</h3>
-                <p className="text-[10px] text-white/80">Online | We're here to help</p>
+                <p className="text-[10px] text-white/80">Online | Homemade with love</p>
               </div>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/10 rounded-full">
@@ -161,22 +136,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
             </button>
           </div>
 
-          <div 
-            ref={scrollRef}
-            className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4 scroll-smooth"
-          >
+          <div ref={scrollRef} className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4 scroll-smooth">
             {messages.map((msg, idx) => (
-              <div 
-                key={idx} 
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div 
-                  className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                    msg.role === 'user' 
-                      ? 'bg-red-600 text-white rounded-tr-none' 
-                      : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-none'
-                  }`}
-                >
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-red-600 text-white rounded-tr-none' : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-none'}`}>
                   {msg.text}
                 </div>
               </div>
@@ -198,30 +161,19 @@ const Chatbot: React.FC<ChatbotProps> = ({ onAddToCart }) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Ask us anything..."
-                className="flex-grow px-4 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                placeholder="Order Khawsa or ask a question..."
+                className="flex-grow px-4 py-2 bg-gray-100 text-gray-900 placeholder-gray-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-600/20"
               />
-              <button 
-                onClick={handleSend}
-                disabled={isLoading}
-                className="p-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
+              <button onClick={handleSend} disabled={isLoading} className="p-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50">
                 <Send className="w-5 h-5" />
               </button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="flex items-center space-x-3">
-        {/* Chat Toggle Button */}
-        <button 
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-14 h-14 bg-red-600 text-white rounded-full shadow-lg hover:shadow-red-200 hover:scale-110 transition-all flex items-center justify-center group"
-        >
-          {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
-        </button>
-      </div>
+      <button onClick={() => setIsOpen(!isOpen)} className="w-14 h-14 bg-red-600 text-white rounded-full shadow-lg hover:shadow-red-200 hover:scale-110 transition-all flex items-center justify-center group">
+        {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
+      </button>
     </div>
   );
 };

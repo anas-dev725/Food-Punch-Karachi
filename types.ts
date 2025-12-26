@@ -24,3 +24,27 @@ export interface Review {
   text: string;
   rating: number;
 }
+
+// AI Types (Decoupled from @google/genai for client-side use)
+export interface Part {
+  text?: string;
+  inlineData?: {
+    mimeType: string;
+    data: string;
+  };
+  functionCall?: {
+    name: string;
+    args: Record<string, any>;
+    id?: string;
+  };
+  functionResponse?: {
+    name: string;
+    response: Record<string, any>;
+    id?: string;
+  };
+}
+
+export interface Content {
+  role: string;
+  parts: Part[];
+}

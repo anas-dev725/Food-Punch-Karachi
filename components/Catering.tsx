@@ -14,6 +14,8 @@ const Catering: React.FC = () => {
     }
   };
 
+  const whatsappRaw = BUSINESS_INFO.whatsapp.replace(/\D/g, '');
+
   return (
     <section className="pb-32 bg-transparent">
       <div className="max-w-7xl mx-auto px-6">
@@ -70,7 +72,7 @@ const Catering: React.FC = () => {
               <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-6">Ready to Plan Your Event?</h3>
               <p className="text-gray-500 dark:text-slate-400 mb-8 max-w-lg mx-auto">Contact us on WhatsApp to discuss your menu and requirements. We recommend booking at least 48 hours in advance.</p>
               <a 
-                href={`https://wa.me/${BUSINESS_INFO.whatsapp}?text=Hi%20Food%20Punch!%20I'm%20interested%20in%20your%20catering%20services.`}
+                href={`https://wa.me/${whatsappRaw}?text=Hi%20Food%20Punch!%20I'm%20interested%20in%20your%20catering%20services.`}
                 target="_blank"
                 className="inline-flex items-center space-x-3 px-10 py-5 bg-primary text-white font-bold rounded-xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
               >

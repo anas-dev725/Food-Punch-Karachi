@@ -8,6 +8,8 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ onExplore }) => {
+  const whatsappRaw = BUSINESS_INFO.whatsapp.replace(/\D/g, '');
+
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden dot-grid">
       {/* Food-themed Background Gradients */}
@@ -47,7 +49,7 @@ const Hero: React.FC<HeroProps> = ({ onExplore }) => {
             Explore Menu
           </button>
           <a 
-            href={`https://wa.me/${BUSINESS_INFO.whatsapp}`}
+            href={`https://wa.me/${whatsappRaw}`}
             target="_blank"
             className="px-12 py-5 bg-white dark:bg-slate-900 text-gray-900 dark:text-white font-bold rounded-2xl border border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all flex items-center space-x-2 shadow-sm"
           >

@@ -21,7 +21,8 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, onNavigateToMenu, items, o
   const handleOrder = () => {
     const itemString = items.map(i => `${i.name} x${i.quantity}`).join(', ');
     const message = encodeURIComponent(`Assalamu Alaikum Food Punch! I'd like to place an order for: ${itemString}. Total bill: Rs. ${total}.`);
-    window.open(`https://wa.me/${BUSINESS_INFO.whatsapp}?text=${message}`, '_blank');
+    const whatsappRaw = BUSINESS_INFO.whatsapp.replace(/\D/g, '');
+    window.open(`https://wa.me/${whatsappRaw}?text=${message}`, '_blank');
   };
 
   if (!isOpen) return null;

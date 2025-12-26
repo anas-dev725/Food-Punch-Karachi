@@ -1,8 +1,37 @@
 
-import { GoogleGenAI, FunctionDeclaration, Type, Content } from "@google/genai";
+import { GoogleGenAI, FunctionDeclaration, Type } from "@google/genai";
 import { BUSINESS_INFO, MENU_ITEMS } from "../constants";
+import { Content } from "../types";
 
-// Define the tool
+// Initialize AI Client
+const apiKey = process.env.API_KEY;
+const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+
+// 1. Prepare System Instruction
+const menuStr = MENU_ITEMS.map(item => `${item.name}: Rs. ${item.price} (${item.category})`).join(', ');
+
+const systemInstruction = `
+  You are a friendly AI assistant for "Food Punch Karachi", a home-based food business.
+  
+  Business Info:
+  - Tagline: ${BUSINESS_INFO.tagline}
+  - Description: ${BUSINESS_INFO.description}
+  - WhatsApp: ${BUSINESS_INFO.whatsapp}
+  
+  Menu:
+  ${menuStr}
+  
+  Specialties: Memoni Khawsa and Singaporean Rice.
+  
+  Your Goal:
+  - Answer questions about the menu, prices, and ingredients.
+  - Be warm, polite, and helpful (like a caring home cook).
+  - If a user explicitly confirms they want to order specific items (e.g., "Yes, add 2 Khawsa"), use the 'addToCart' tool.
+  - Do NOT call 'addToCart' if they are just asking for price or info. Only if they confirm intent to buy.
+  - Keep responses concise and avoid using Markdown formatting (no asterisks/bolding).
+`;
+
+// 2. Define Tools
 const addToCartTool: FunctionDeclaration = {
   name: 'addToCart',
   parameters: {
@@ -25,27 +54,12 @@ const addToCartTool: FunctionDeclaration = {
 };
 
 export const getChatbotResponse = async (history: Content[]) => {
-  // Always initialize with named parameter apiKey from process.env.API_KEY
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
-  const menuStr = MENU_ITEMS.map(item => `${item.name}: Rs. ${item.price}`).join(', ');
-  
-  const systemInstruction = `
-    You are a friendly AI assistant for "Food Punch Karachi", a home-based food business in Karachi.
-    Business Info: ${BUSINESS_INFO.description} ${BUSINESS_INFO.tagline}.
-    Contact: ${BUSINESS_INFO.whatsapp}.
-    Menu: ${menuStr}.
-    Specialties: Memoni Khawsa and Singaporean Rice.
-    Tone: Warm, helpful, and polite. Encourage users to place orders via the cart or WhatsApp.
-    
-    IMPORTANT RULES:
-    1. Do NOT use asterisks (*) for bolding or markdown. Keep response plain text.
-    2. Keep answers concise.
-    3. If the user says "Yes", "Confirm order", "I want this", or clearly confirms they want to add specific items to their order, call the 'addToCart' tool with the item details.
-    4. When you call the 'addToCart' tool, YOU MUST STOP and wait for the tool execution. Do NOT generate text in the same turn as the tool call.
-    5. After the tool output is provided to you (confirming items are added), THEN you reply to the user confirming the action verbally and asking if they want anything else.
-    6. Do not call the tool if the user is just asking for information.
-  `;
+  if (!apiKey) {
+    console.error("API Key is missing!");
+    return {
+      text: "I'm sorry, I'm not configured correctly (Missing API Key).",
+    };
+  }
 
   try {
     const response = await ai.models.generateContent({
@@ -58,22 +72,19 @@ export const getChatbotResponse = async (history: Content[]) => {
       },
     });
 
-    let text = response.text || "";
-    // Remove asterisks if any slipped through
-    text = text.replace(/\*/g, '');
+    const text = response.text || "";
 
     return {
-      text,
+      text: text.replace(/\*/g, ''), // Clean up any markdown
       toolCalls: response.functionCalls,
-      // Helper to construct the model's turn in the history for the next request
       modelContent: response.candidates?.[0]?.content
     };
-  } catch (error) {
-    console.error("Chatbot error:", error);
+    
+  } catch (error: any) {
+    console.error("Gemini Service Error:", error);
     return {
-      text: "Our apologies! Something went wrong connecting to the AI. You can reach us directly at " + BUSINESS_INFO.whatsapp,
-      toolCalls: undefined,
-      modelContent: undefined
+      text: "I'm having trouble connecting to the kitchen right now. Please try again!",
+      error: error.message
     };
   }
 };
